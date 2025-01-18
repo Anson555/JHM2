@@ -1,30 +1,32 @@
-pip install requests
 import requests
 
-# Replace 'your_api_key' with your actual API key
-api_key = "your_api_key"
-base_url = "http://api.openweathermap.org/data/2.5/weather?"
+def get_weather(city, api_key):
+    base_url = "http://api.openweathermap.org/data/2.5/weather?"
+    complete_url = base_url + "appid=" + api_key + "&q=" + city + "&units=metric"
+    
+    response = requests.get(complete_url)
+    data = response.json()
+    
+    if data["cod"] != "404":
+        main = data["main"]
+        weather = data["weather"][0]
+        
+        temperature = main["temp"]
+        pressure = main["pressure"]
+        humidity = main["humidity"]
+        description = weather["description"]
+        
+        report = (f"Weather Report for {city}:\n"
+                  f"Temperature: {temperature}°C\n"
+                  f"Pressure: {pressure} hPa\n"
+                  f"Humidity: {humidity}%\n"
+                  f"Description: {description.capitalize()}")
+        
+        return report
+    else:
+        return "City not found."
 
-# Get city name from user input
-city_name = input("Enter city name: ")
-complete_url = base_url + "appid=" + api_key + "&q=" + city_name
-
-# Make the request and get the response
-response = requests.get(complete_url)
-data = response.json()
-
-# Check if the city is found
-if data["cod"] != "404":
-    main = data["main"]
-    weather = data["weather"][0]
-    temperature = main["temp"]
-    pressure = main["pressure"]
-    humidity = main["humidity"]
-    description = weather["description"]
-
-    print(f"Temperature: {temperature}K")
-    print(f"Atmospheric pressure: {pressure} hPa")
-    print(f"Humidity: {humidity}%")
-    print(f"Weather description: {description}")
-else:
-    print("City not found.")
+if __name__ == "__main__":
+    city_name = input("Enter city name: ")
+    api_key = "YOUR_API_KEY"
+    print(get_weather(city_name, api_key))
